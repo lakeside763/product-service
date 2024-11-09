@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/lakeside763/product-service/internal/core/services"
+	"github.com/lakeside763/product-service/pkg/utils"
 )
 
 type ProductHandler struct {
@@ -17,11 +18,21 @@ func NewProductHandler(service *services.ProductService) *ProductHandler {
 }
 
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	products, err := h.productService.GetAllProducts()
+	queryParams := r.URL.Query()
+	priceLessThan := queryParams.Get("priceLessThan")
+	lastProductId := queryParams.Get("lastProductId")
+	pageSize := queryParams.Get("pageSize")
+
+	priceLessThanToInt, _ := strconv.Atoi(priceLessThan)
+	pageSizeToInt, _ := strconv.Atoi(pageSize)
+
+	products, err := h.productService.GetProductsWithDiscount(priceLessThanToInt, lastProductId, pageSizeToInt)
 	if err != nil {
 		http.Error(w, "Failed to fetch products", http.StatusInternalServerError)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(products)
+	utils.JSONResponse(w, http.StatusOK, products)	
 }
+
+// w.Header().Set("Content-Type", "application/json")
+// json.NewEncoder(w).Encode(products)

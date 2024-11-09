@@ -13,8 +13,8 @@ type Product struct {
 }
 
 type PriceWithDiscount struct {
-	Original           int
-	Final              int
+	Original           float64
+	Final              float64
 	DiscountPercentage string
 	Currency           string
 }

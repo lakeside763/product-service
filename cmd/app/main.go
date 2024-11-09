@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 	"github.com/lakeside763/product-service/config"
-	"github.com/lakeside763/product-service/internal/adapters/database"
+	"github.com/lakeside763/product-service/internal/adapters/cache"
 	"github.com/lakeside763/product-service/internal/adapters/repositories"
 	"github.com/lakeside763/product-service/internal/core/services"
 	"github.com/lakeside763/product-service/internal/ports/http/handlers"
@@ -27,14 +27,15 @@ func main() {
 	// Initialize Configuration
 	config := config.LoadConfig()
 
-	// Initialize PostgreSQL database
-	db, err := database.PostgresDB(config.DatabaseURL)
+	// Initialize Data repositories
+	dataRepo, err := repositories.NewDataRepo(config.DatabaseURL)
 	if err != nil {
-		log.Fatalf("Error initializing database: %v", err)
+		log.Fatalf("Error initializing repositories: %v", err)
 	}
 
-	productRepo := repositories.NewProductRepo(db) // Initialize product repo
-	productService := services.NewProductService(productRepo) // Initialize product service
+	cache := cache.NewRedisCache(config.RedisURL)
+
+	productService := services.NewProductService(dataRepo.Product, cache) // Initialize product service
 	productHandler := handlers.NewProductHandler(productService) // Initialize product handler
 
 	// Main router
