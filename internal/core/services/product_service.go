@@ -33,6 +33,7 @@ func (s *ProductService) GetProductsWithDiscount(priceLessThan int, lastProductI
 	// Map products to ProductWithDiscountResponse
 	var response []*models.ProductWithDiscountResponse
 	for _, product := range products {
+		// Apply discount to the product
 		discount, err := s.getDiscountForProduct(product)
 		if err != nil {
 			return nil, err
