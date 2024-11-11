@@ -13,50 +13,21 @@ import (
 )
 
 func TestGetProductWithDiscount(t *testing.T) {
-	// Create a new Gomock controller
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	// Using setup function to inialize dependencies
+	setup := setupProductServiceTest(t)
+	defer setup.Controller.Finish()
 
-	// Create mock dependencies
-	mockRepo := interfaces.NewMockProducts(ctrl)
-	mockCache := interfaces.NewMockRedis(ctrl)
-
-	// Create a prodcutService instance with mocks
-	productService := NewProductService(mockRepo, mockCache)
-
-	// Mock product data
-	product := &models.Product{
-		Sku:       "12345",
-		Name:      "Test Product",
-		Category:  "Electronics",
-		Price:     10000, // 100.00 EUR in integer format
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
-	// Expected result
-	expectedResponse := &models.ProductWithDiscountResponse{
-		Sku:      product.Sku,
-		Name:     product.Name,
-		Category: product.Category,
-		Price: models.PriceWithDiscount{
-			Original:           utils.ConvertPriceToDisplayFormat(product.Price),
-			Final:              utils.ConvertPriceToDisplayFormat(product.Price), // No discount applied
-			DiscountPercentage: "",
-			Currency:           "EUR",
-		},
-		CreatedAt: product.CreatedAt,
-		UpdatedAt: product.UpdatedAt,
-	}
+	product := createMockProduct("60d4403f-7ab7-4336-9017-0b397f71065f", "12345", "Test Product", "Electronics", 10000)
+	expectedResponse := createExpectedResponse(product, 10000, "")
 
 	// Set up mock expectations
-	mockRepo.EXPECT().GetProducts(gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.Product{product}, nil)
-	mockCache.EXPECT().Get(gomock.Any()).Return("", errors.New("cache miss"))
-	mockRepo.EXPECT().GetMaxDiscount(product.Category, product.Sku).Return(0.0, nil) // No discount
-	mockCache.EXPECT().Set(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
+	setup.MockRepo.EXPECT().GetProducts(gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.Product{product}, nil)
+	setup.MockCache.EXPECT().Get(gomock.Any()).Return("", errors.New("cache miss"))
+	setup.MockRepo.EXPECT().GetMaxDiscount(product.Category, product.Sku).Return(0.0, nil) // No discount
+	setup.MockCache.EXPECT().Set(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 
 	// Execute the method
-	result, err := productService.GetProductsWithDiscount(15000, "", 10)
+	result, err := setup.ProductService.GetProductsWithDiscount(15000, "", 10)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -65,54 +36,78 @@ func TestGetProductWithDiscount(t *testing.T) {
 }
 
 func TestGetProductWithDiscount_WithDiscountFromCache(t *testing.T) {
-	// Create a new Gomock controller
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	// Setup product service test
+	setup := setupProductServiceTest(t)
+	defer setup.Controller.Finish()
 
-	// Create mock dependencies
+	// Now access mocks and services from the setup struct
+	product := createMockProduct("60d4403f-7ab7-4336-9017-0b397f71065f", "12345", "Test Product", "Electronics", 10000)
+	discount := 20.0 // 20% discount
+	finalPrice := int(float64(product.Price) * (1 - discount/100))
+	expectedResponse := createExpectedResponse(product, finalPrice, "20%")
+	
+	// Set up mock expectations
+	setup.MockRepo.EXPECT().GetProducts(gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.Product{product}, nil)
+	setup.MockCache.EXPECT().Get(gomock.Any()).Return("20.0", nil) // Cache hit with 20% discount
+
+	// Execute the method
+	result, err := setup.ProductService.GetProductsWithDiscount(30000, "", 10)
+
+	// Assertions
+	assert.NoError(t, err)
+	assert.Len(t, result, 1)
+	assert.Equal(t, expectedResponse, result[0])
+	assert.Equal(t, expectedResponse.Name, result[0].Name)
+}
+
+type ProductServiceTest struct {
+	Controller *gomock.Controller
+	MockRepo *interfaces.MockProducts
+	MockCache *interfaces.MockRedis
+	ProductService *ProductService
+}
+
+func setupProductServiceTest(t *testing.T) *ProductServiceTest {
+	ctrl := gomock.NewController(t)
 	mockRepo := interfaces.NewMockProducts(ctrl)
 	mockCache := interfaces.NewMockRedis(ctrl)
-
-	// Create a ProductService instance with mocks
 	productService := NewProductService(mockRepo, mockCache)
 
-	// Mock product data
-	product := &models.Product{
-		Sku:       "12345",
-		Name:      "Discounted Product",
-		Category:  "Apparel",
-		Price:     20000, // 200.00 EUR in integer format
+	return &ProductServiceTest{
+		Controller: 	ctrl,
+		MockRepo: 		mockRepo,
+		MockCache: 		mockCache,
+		ProductService: productService,
+	}
+}
+
+// Helper function to create mock product data
+func createMockProduct(id, sku, name, category string, price int) *models.Product {
+	return &models.Product{
+		ID: 			 id,
+		Sku:       sku,
+		Name:      name,
+		Category:  category,
+		Price:     price,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
+}
 
-	discount := 20.0 // 20% discount
-	finalPrice := int(float64(product.Price) * (1 - discount/100))
-
-	// Expected result with discount
-	expectedResponse := &models.ProductWithDiscountResponse{
+// Helper function to create expected response data
+func createExpectedResponse(product *models.Product, finalPrice int, discount string) *models.ProductWithDiscountResponse {
+	return &models.ProductWithDiscountResponse{
+		ID: 			product.ID,
 		Sku:      product.Sku,
 		Name:     product.Name,
 		Category: product.Category,
 		Price: models.PriceWithDiscount{
 			Original:           utils.ConvertPriceToDisplayFormat(product.Price),
 			Final:              utils.ConvertPriceToDisplayFormat(finalPrice),
-			DiscountPercentage: "20%",
+			DiscountPercentage: discount,
 			Currency:           "EUR",
 		},
 		CreatedAt: product.CreatedAt,
 		UpdatedAt: product.UpdatedAt,
 	}
-
-	// Set up mock expectations
-	mockRepo.EXPECT().GetProducts(gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.Product{product}, nil)
-	mockCache.EXPECT().Get(gomock.Any()).Return("20.0", nil) // Cache hit with 20% discount
-
-	// Execute the method
-	result, err := productService.GetProductsWithDiscount(30000, "", 10)
-
-	// Assertions
-	assert.NoError(t, err)
-	assert.Len(t, result, 1)
-	assert.Equal(t, expectedResponse, result[0])
 }

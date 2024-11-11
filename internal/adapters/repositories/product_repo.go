@@ -23,7 +23,7 @@ func (repo *ProductRepo) GetProducts(priceLessThan int, lastProductId string, pa
 	priceLessThan = utils.ConvertPriceToStoredFormat(priceLessThan)
 
 	// Start the query
-	query := repo.DB.Limit(pageSize).Order("id ASC")
+	query := repo.DB.Limit(pageSize).Order("created_at ASC")
 
 	// Apply the price filter conditionally
 	if priceLessThan > 0 {
