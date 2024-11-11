@@ -5,7 +5,7 @@
 - By Moses Idowu
 
 ### Overview
-Product service for managing product category, discount and product search based on price less than.
+Product service for managing product categories, discounts and products search.
 
 ### Prerequisites
 The solution was built using the following
@@ -24,7 +24,7 @@ Steps
 ```
 
 - Setup env configuration
-Using sample-env.text file to setup .env as follows
+Using env-sample.txt file to setup .env as follows
 ```
 DATABASE_URL=postgres://postgres:password@postgres:5432/mytheresa?sslmode=disable
 DB_HOST=postgres
@@ -143,6 +143,11 @@ go test -v ./...
       /mocks
       product_interface.go
       redis_interface.go
+
+/pkg
+  /utils                        # Managing helper functions
+    json_response.go
+    price_conversion.go
 
 env-sample.txt                  # env data samples
 ```
