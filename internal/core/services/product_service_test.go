@@ -17,17 +17,17 @@ func TestGetProductWithDiscount(t *testing.T) {
 	setup := setupProductServiceTest(t)
 	defer setup.Controller.Finish()
 
-	product := createMockProduct("60d4403f-7ab7-4336-9017-0b397f71065f", "12345", "Test Product", "Electronics", 10000)
+	product := createMockProduct("60d4403f-7ab7-4336-9017-0b397f71065f", "000001", "Leather ankle boots", "boots", 10000)
 	expectedResponse := createExpectedResponse(product, 10000, "")
 
 	// Set up mock expectations
-	setup.MockRepo.EXPECT().GetProducts(gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.Product{product}, nil)
+	setup.MockRepo.EXPECT().GetProducts(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.Product{product}, nil)
 	setup.MockCache.EXPECT().Get(gomock.Any()).Return("", errors.New("cache miss"))
 	setup.MockRepo.EXPECT().GetMaxDiscount(product.Category, product.Sku).Return(0.0, nil) // No discount
 	setup.MockCache.EXPECT().Set(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 
 	// Execute the method
-	result, err := setup.ProductService.GetProductsWithDiscount(15000, "", 10)
+	result, err := setup.ProductService.GetProductsWithDiscount("boots", 15000, "", 10)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -47,11 +47,11 @@ func TestGetProductWithDiscount_WithDiscountFromCache(t *testing.T) {
 	expectedResponse := createExpectedResponse(product, finalPrice, "20%")
 	
 	// Set up mock expectations
-	setup.MockRepo.EXPECT().GetProducts(gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.Product{product}, nil)
+	setup.MockRepo.EXPECT().GetProducts(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]*models.Product{product}, nil)
 	setup.MockCache.EXPECT().Get(gomock.Any()).Return("20.0", nil) // Cache hit with 20% discount
 
 	// Execute the method
-	result, err := setup.ProductService.GetProductsWithDiscount(30000, "", 10)
+	result, err := setup.ProductService.GetProductsWithDiscount("boots", 30000, "", 10)
 
 	// Assertions
 	assert.NoError(t, err)

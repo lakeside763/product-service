@@ -16,23 +16,23 @@ func TestProductRepo_GetProducts(t *testing.T) {
 
 	// Insert sample products
 	products := []models.Product{
-		newProduct("001", "Product1", "Electronics", 10000),
-		newProduct("002", "Product2", "Electronics", 20000),
-		newProduct("003", "Product3", "Apparel", 30000),
+		newProduct("000001", "BV Lean leather ankle boots", "boots", 10000),
+		newProduct("000002", "BV Lean leather ankle boots", "boots", 20000),
+		newProduct("000003", "Naima embellished suede sandals", "sandals", 30000),
 	}
 	db.Create(&products)
 	
 
 	// Test case 1: Retrieve products with no price filter
-	result, err := repo.GetProducts(0, "", 10)
+	result, err := repo.GetProducts("boots", 0, "", 10)
 	assert.NoError(t, err)
-	assert.Len(t, result, 3) 
-	assert.Equal(t, "Product1", result[0].Name)
+	assert.Len(t, result, 2) 
+	assert.Equal(t, "BV Lean leather ankle boots", result[0].Name)
 
 	// Test case 2: Retrieve products with priceLessThan filter
-	result, err = repo.GetProducts(250, "", 10)
+	result, err = repo.GetProducts("boots", 200, "", 10)
 	assert.NoError(t, err)
-	assert.Len(t, result, 2) // Expecting two products priced below 2500
+	assert.Len(t, result, 1) // Expecting two products priced below 2500
 }
 
 func TestProductRepo_GetMaxDiscount(t *testing.T) {
@@ -40,26 +40,26 @@ func TestProductRepo_GetMaxDiscount(t *testing.T) {
 
 	// Insert sample discounts
 	discounts := []models.Discount{
-		{Category: "Electronics", Sku: "001", DiscountPercentage: 15.0},
-		{Category: "Electronics", Sku: "002", DiscountPercentage: 20.0},
-		{Category: "Apparel", Sku: "003", DiscountPercentage: 10.0},
+		{Category: "boots", Sku: "000001", DiscountPercentage: 15.0},
+		{Category: "boots", Sku: "000002", DiscountPercentage: 20.0},
+		{Category: "sandals", Sku: "000003", DiscountPercentage: 10.0},
 	}
 	db.Create(&discounts)
 
 	// Test case 1: Retrieve max discount for category "Electronics"
-	maxDiscount, err := repo.GetMaxDiscount("Electronics", "")
+	maxDiscount, err := repo.GetMaxDiscount("boots", "")
 	assert.NoError(t, err)
 	assert.Equal(t, 20.0, maxDiscount)
 
 	// Test case 2: Retrieve max discount for SKU "003"
-	maxDiscount, err = repo.GetMaxDiscount("", "003")
+	maxDiscount, err = repo.GetMaxDiscount("", "000002")
 	assert.NoError(t, err)
-	assert.Equal(t, 10.0, maxDiscount)
+	assert.Equal(t, 20.0, maxDiscount)
 
 	// Test case 3: Retrieve max discount for both category "Apparel" and SKU "001"
-	maxDiscount, err = repo.GetMaxDiscount("Apparel", "001")
+	maxDiscount, err = repo.GetMaxDiscount("boots", "000001")
 	assert.NoError(t, err)
-	assert.Equal(t, 15.0, maxDiscount) // Assuming highest between category and SKU is taken
+	assert.Equal(t, 20.0, maxDiscount) // Assuming highest between category and SKU is taken
 }
 
 func setupTestDB(t *testing.T) (*gorm.DB, *ProductRepo) {

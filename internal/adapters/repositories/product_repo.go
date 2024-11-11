@@ -16,14 +16,14 @@ func NewProductRepo(db *gorm.DB) interfaces.Products {
 }
 
 // GetProducts implements interfaces.Products.
-func (repo *ProductRepo) GetProducts(priceLessThan int, lastProductId string, pageSize int) ([]*models.Product, error) {
+func (repo *ProductRepo) GetProducts(category string, priceLessThan int, lastProductId string, pageSize int) ([]*models.Product, error) {
 	var products []*models.Product
 
 	pageSize = max(pageSize, 10)
 	priceLessThan = utils.ConvertPriceToStoredFormat(priceLessThan)
 
 	// Start the query
-	query := repo.DB.Limit(pageSize).Order("created_at ASC")
+	query := repo.DB.Where("category = ?", category).Limit(pageSize).Order("created_at ASC")
 
 	// Apply the price filter conditionally
 	if priceLessThan > 0 {

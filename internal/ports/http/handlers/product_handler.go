@@ -19,6 +19,7 @@ func NewProductHandler(service *services.ProductService) *ProductHandler {
 
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	queryParams := r.URL.Query()
+	category := queryParams.Get("category")
 	priceLessThan := queryParams.Get("priceLessThan")
 	lastProductId := queryParams.Get("lastProductId")
 	pageSize := queryParams.Get("pageSize")
@@ -26,9 +27,16 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request, _ h
 	priceLessThanToInt, _ := strconv.Atoi(priceLessThan)
 	pageSizeToInt, _ := strconv.Atoi(pageSize)
 
-	products, err := h.productService.GetProductsWithDiscount(priceLessThanToInt, lastProductId, pageSizeToInt)
+	// Check if category is empty
+	if category == "" {
+		http.Error(w, "Category is required", http.StatusBadRequest)
+		return
+	}
+
+	products, err := h.productService.GetProductsWithDiscount(category, priceLessThanToInt, lastProductId, pageSizeToInt)
 	if err != nil {
 		http.Error(w, "Failed to fetch products", http.StatusInternalServerError)
+		return
 	}
 
 	utils.JSONResponse(w, http.StatusOK, products)	

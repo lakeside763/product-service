@@ -23,9 +23,9 @@ func NewProductService(repo interfaces.Products, cache interfaces.Redis) *Produc
 	}
 }
 
-func (s *ProductService) GetProductsWithDiscount(priceLessThan int, lastProductId string, pageSize int) ([]*models.ProductWithDiscountResponse, error) {
+func (s *ProductService) GetProductsWithDiscount(category string, priceLessThan int, lastProductId string, pageSize int) ([]*models.ProductWithDiscountResponse, error) {
 	// Get product passed on priceLessThan, lastProductId and pageSize
-	products, err := s.repo.GetProducts(priceLessThan, lastProductId, pageSize)
+	products, err := s.repo.GetProducts(category, priceLessThan, lastProductId, pageSize)
 	if err != nil {
 		return nil, err
 	}
