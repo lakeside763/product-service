@@ -10,6 +10,7 @@ CREATE TABLE products (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_products_category ON products(category);
 CREATE INDEX idx_products_price ON products(price);
 
 CREATE TABLE discounts (

@@ -20,6 +20,11 @@ func NewRedisCache(addr string) *RedisCache {
 	return &RedisCache{Client: client}
 }
 
+// Close method to close the Redis connection
+func (c *RedisCache) Close() error {
+	return c.Client.Close()
+}
+
 func (c *RedisCache) Set(key string, value interface{}, expiration time.Duration) error {
 	return c.Client.Set(context.TODO(), key, value, expiration).Err()
 }
