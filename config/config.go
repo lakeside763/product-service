@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 )
 
 type Config struct {
@@ -22,10 +23,12 @@ func LoadConfig() *Config {
 		os.Getenv("DB_PORT"),
 	)
 
+	port, _ := strconv.Atoi(os.Getenv("APP_PORT"))
+
 	return &Config{
 		DatabaseURL:  databaseUrl,
 		RedisURL:     os.Getenv("REDIS_URL"),
 		DatabaseName: os.Getenv("DB_NAME"),
-		Port:         4500,
+		Port:         port,
 	}
 }
