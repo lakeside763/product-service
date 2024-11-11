@@ -13,17 +13,18 @@ type Product struct {
 }
 
 type PriceWithDiscount struct {
-	Original           float64
-	Final              float64
-	DiscountPercentage string
-	Currency           string
+	Original           float64 	`json:"original"`
+	Final              float64	`json:"final"`
+	DiscountPercentage string		`json:"discount_percentage"`
+	Currency           string		`json:"currency"`
 }
 
 type ProductWithDiscountResponse struct {
-	Sku string
-	Name string
-	Category string
-	Price PriceWithDiscount
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID string									`json:"id"`
+	Sku string								`json:"sku"`
+	Name string								`json:"name"`
+	Category string						`json:"category"`
+	Price PriceWithDiscount		`json:"price"`
+	CreatedAt time.Time				`json:"created_at"`
+	UpdatedAt time.Time				`json:"updated_at"`
 }

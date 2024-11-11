@@ -12,13 +12,13 @@ import (
 )
 
 type ProductService struct {
-	repo interfaces.Products
+	repo  interfaces.Products
 	cache interfaces.Redis
 }
 
 func NewProductService(repo interfaces.Products, cache interfaces.Redis) *ProductService {
 	return &ProductService{
-		repo: repo,
+		repo:  repo,
 		cache: cache,
 	}
 }
@@ -47,7 +47,7 @@ func (s *ProductService) GetProductsWithDiscount(priceLessThan int, lastProductI
 func (s *ProductService) getDiscountForProduct(product *models.Product) (float64, error) {
 	var discount float64
 	cacheKey := fmt.Sprintf("discount-%s-%s", product.Category, product.Sku)
-	cacheExpiration := 3 * 24 * time.Hour  // Discount expires in 3 days
+	cacheExpiration := 3 * 24 * time.Hour // Discount expires in 3 days
 
 	// Check cache for an existing discount
 	cachedDiscount, err := s.cache.Get(cacheKey)
@@ -78,9 +78,10 @@ func (s *ProductService) mapToProductWithDiscountResponse(product *models.Produc
 	}
 
 	return &models.ProductWithDiscountResponse{
-		Sku:       product.Sku,
-		Name:      product.Name,
-		Category:  product.Category,
+		ID:       product.ID,
+		Sku:      product.Sku,
+		Name:     product.Name,
+		Category: product.Category,
 		Price: models.PriceWithDiscount{
 			Original:           utils.ConvertPriceToDisplayFormat(product.Price),
 			Final:              utils.ConvertPriceToDisplayFormat(finalPrice),

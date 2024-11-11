@@ -1,0 +1,41 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mytheresa
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d # Load SQL on startup
+    networks:
+      - product-network
+    ports:
+      - "5436:5432"
+
+  redis:
+    image: redis:latest
+    networks:
+      - product-network
+
+  product-service:
+    build: .
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgres://postgres:password@postgres:5432/mytheresa?sslmode=disable
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "4500:4500"
+    networks:
+      - product-network
+
+volumes:
+  pgdata:
+
+networks:
+  product-network:
