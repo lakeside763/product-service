@@ -19,3 +19,7 @@ EXPOSE 4500
 
 # Run the binary
 CMD ["./main"]
+
+
+
+
