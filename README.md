@@ -49,12 +49,13 @@ go test -v ./...
 ### API Documentation
 - GetProducts endpoint
 ```
-- http://localhost:4500/products?category=boots&priceLessThan=800&pageSize=10
+- http://localhost:4500/products?category=boots&priceLessThan=800&pageSize=10&lastProductId=2c870ffa-a71e-48f9-9e98-20b0f640c5b6
 
 From the query string
 - category is required
 - priceLessThan is optional
 - pageSize is optional
+- lastProductId is optional
 ```
 - GetProduct sample results
 ```
