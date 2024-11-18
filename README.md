@@ -57,7 +57,7 @@ From the query string
 - pageSize is optional
 - lastProductId is optional
 ```
-- GetProduct sample results
+- GetProducts sample results
 ```
 [
     {
@@ -116,7 +116,7 @@ From the query string
 /config                   # Application configuration
   config.go
 
-/init-scripts             # Postgres db configuration, table and sample data insertion
+/init-scripts             # Postgres db configuration, table and sample data insertion for docker
   init.sql
 
 
