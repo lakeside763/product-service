@@ -49,8 +49,6 @@ func (s *ProductService) getDiscountForProduct(product *models.Product) (float64
 	cacheKey := fmt.Sprintf("discount-%s-%s", product.Category, product.Sku)
 	cacheExpiration := 3 * 24 * time.Hour // Discount expires in 3 days
 
-	fmt.Println(cacheExpiration)
-
 	// Check cache for an existing discount
 	cachedDiscount, err := s.cache.Get(cacheKey)
 	if err == nil && cachedDiscount != "" {
