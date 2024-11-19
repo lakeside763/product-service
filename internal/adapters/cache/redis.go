@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/lakeside763/product-service/config"
-	log "github.com/sirupsen/logrus"
 )
 
 type RedisCache struct {
