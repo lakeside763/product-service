@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/lakeside763/product-service/config"
+	log "github.com/sirupsen/logrus"
 )
 
 type RedisCache struct {
@@ -14,9 +15,11 @@ type RedisCache struct {
 
 func NewRedisCache(addr string) *RedisCache {
 	config := config.LoadConfig()
+
 	client := redis.NewClient(&redis.Options{
 		Addr: config.RedisURL,
 	})
+
 	return &RedisCache{Client: client}
 }
 

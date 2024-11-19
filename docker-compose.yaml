@@ -25,6 +25,11 @@ services:
     image: redis:latest
     networks:
       - product-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
   product-service:
     build: .
@@ -32,12 +37,12 @@ services:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     env_file:
       - .env
     environment:
       DATABASE_URL: postgres://postgres:password@postgres:5432/mytheresa?sslmode=disable
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis:6379
     ports:
       - "4500:4500"
     networks:

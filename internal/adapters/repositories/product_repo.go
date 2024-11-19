@@ -19,7 +19,12 @@ func NewProductRepo(db *gorm.DB) interfaces.Products {
 func (repo *ProductRepo) GetProducts(category string, priceLessThan int, lastProductId string, pageSize int) ([]*models.Product, error) {
 	var products []*models.Product
 
-	pageSize = max(pageSize, 10)
+	if pageSize <= 0 {
+		pageSize = 20
+	} else if pageSize > 100 {
+		pageSize  = 100
+	}
+
 	priceLessThan = utils.ConvertPriceToStoredFormat(priceLessThan)
 
 	// Start the query
