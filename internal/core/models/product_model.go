@@ -5,7 +5,8 @@ import (
 )
 
 type Product struct {
-	ID        string 		`json:"id" gorm:"type:text;primaryKey"`
+	ID        string    `json:"id" gorm:"type:text;primaryKey"`
+	SerialId  int64     `json:"serial_id" gorm:"type:int;column:serial_id"`
 	Sku       string    `json:"sku" gorm:"size:255; column:sku"`
 	Name      string    `json:"name" gorm:"size:255; column:name"`
 	Category  string    `json:"category" gorm:"size:255; column:category"`
@@ -22,7 +23,7 @@ type PriceWithDiscount struct {
 }
 
 type ProductWithDiscountResponse struct {
-	ID        string        		`json:"id"`
+	ID        string            `json:"id"`
 	Sku       string            `json:"sku"`
 	Name      string            `json:"name"`
 	Category  string            `json:"category"`
@@ -38,4 +39,9 @@ type Discount struct {
 	DiscountPercentage float64   `json:"discount_percentage" gorm:"type:decimal(5,2)"`
 	CreatedAt          time.Time `json:"created_at"`
 	UpdatedAt          time.Time `json:"updated_at"`
+}
+
+type ProductDataResponse struct {
+	Data     []*ProductWithDiscountResponse `json:"data"`
+	CursorId string                         `json:"cursorId"`
 }

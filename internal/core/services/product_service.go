@@ -24,12 +24,12 @@ func NewProductService(repo interfaces.Products, cache interfaces.Redis) *Produc
 }
 
 func (s *ProductService) GetProductsWithDiscount(
-	category string, priceLessThan int, lastProductId string, pageSize int,
-) ([]*models.ProductWithDiscountResponse, error) {
+	category string, priceLessThan int, cursorId string, pageSize int,
+) ([]*models.ProductWithDiscountResponse, string, error) {
 	// Get product passed on priceLessThan, lastProductId and pageSize
-	products, err := s.repo.GetProducts(category, priceLessThan, lastProductId, pageSize)
+	products, nextCursorId, err := s.repo.GetProducts(category, priceLessThan, cursorId, pageSize)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Map products to ProductWithDiscountResponse
@@ -38,12 +38,12 @@ func (s *ProductService) GetProductsWithDiscount(
 		// Apply discount to the product
 		discount, err := s.getDiscountForProduct(product)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		response = append(response, s.mapToProductWithDiscountResponse(product, discount))
 	}
 
-	return response, nil
+	return response, nextCursorId, nil
 }
 
 func (s *ProductService) getDiscountForProduct(product *models.Product) (float64, error) {

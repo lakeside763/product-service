@@ -50,16 +50,17 @@ func (mr *MockProductsMockRecorder) GetMaxDiscount(category, sku interface{}) *g
 }
 
 // GetProducts mocks base method.
-func (m *MockProducts) GetProducts(category string, priceLessThan int, lastProductId string, pageSize int) ([]*models.Product, error) {
+func (m *MockProducts) GetProducts(category string, priceLessThan int, cursorId string, pageSize int) ([]*models.Product, string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProducts", category, priceLessThan, lastProductId, pageSize)
+	ret := m.ctrl.Call(m, "GetProducts", category, priceLessThan, cursorId, pageSize)
 	ret0, _ := ret[0].([]*models.Product)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // GetProducts indicates an expected call of GetProducts.
-func (mr *MockProductsMockRecorder) GetProducts(category, priceLessThan, lastProductId, pageSize interface{}) *gomock.Call {
+func (mr *MockProductsMockRecorder) GetProducts(category, priceLessThan, cursorId, pageSize interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProducts", reflect.TypeOf((*MockProducts)(nil).GetProducts), category, priceLessThan, lastProductId, pageSize)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProducts", reflect.TypeOf((*MockProducts)(nil).GetProducts), category, priceLessThan, cursorId, pageSize)
 }

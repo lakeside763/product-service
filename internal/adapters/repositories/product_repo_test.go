@@ -24,13 +24,13 @@ func TestProductRepo_GetProducts(t *testing.T) {
 	
 
 	// Test case 1: Retrieve products with no price filter
-	result, err := repo.GetProducts("boots", 0, "", 10)
+	result, _, err := repo.GetProducts("boots", 0, "", 10)
 	assert.NoError(t, err)
 	assert.Len(t, result, 2) 
 	assert.Equal(t, "BV Lean leather ankle boots", result[0].Name)
 
 	// Test case 2: Retrieve products with priceLessThan filter
-	result, err = repo.GetProducts("boots", 200, "", 10)
+	result, _, err = repo.GetProducts("boots", 200, "", 10)
 	assert.NoError(t, err)
 	assert.Len(t, result, 1) // Expecting two products priced below 2500
 }

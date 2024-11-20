@@ -27,7 +27,7 @@ func TestGetProductWithDiscount(t *testing.T) {
 	setup.MockCache.EXPECT().Set(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 
 	// Execute the method
-	result, err := setup.ProductService.GetProductsWithDiscount("boots", 15000, "", 10)
+	result, _, err := setup.ProductService.GetProductsWithDiscount("boots", 15000, "", 10)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -51,7 +51,7 @@ func TestGetProductWithDiscount_WithDiscountFromCache(t *testing.T) {
 	setup.MockCache.EXPECT().Get(gomock.Any()).Return("20.0", nil) // Cache hit with 20% discount
 
 	// Execute the method
-	result, err := setup.ProductService.GetProductsWithDiscount("boots", 30000, "", 10)
+	result, _, err := setup.ProductService.GetProductsWithDiscount("boots", 30000, "", 10)
 
 	// Assertions
 	assert.NoError(t, err)

@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/lakeside763/product-service/internal/core/models"
 	"github.com/lakeside763/product-service/internal/core/services"
 	"github.com/lakeside763/product-service/pkg/utils"
 )
@@ -21,7 +22,7 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request, _ h
 	queryParams := r.URL.Query()
 	category := queryParams.Get("category")
 	priceLessThan := queryParams.Get("priceLessThan")
-	lastProductId := queryParams.Get("lastProductId")
+	cursorId := queryParams.Get("cursorId")
 	pageSize := queryParams.Get("pageSize")
 
 	priceLessThanToInt, _ := strconv.Atoi(priceLessThan)
@@ -33,13 +34,18 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request, _ h
 		return
 	}
 
-	products, err := h.productService.GetProductsWithDiscount(category, priceLessThanToInt, lastProductId, pageSizeToInt)
+	products,nextCursorId, err := h.productService.GetProductsWithDiscount(category, priceLessThanToInt, cursorId, pageSizeToInt)
 	if err != nil {
 		http.Error(w, "Failed to fetch products", http.StatusInternalServerError)
 		return
 	}
 
-	utils.JSONResponse(w, http.StatusOK, products)	
+	responseData := models.ProductDataResponse{
+		Data: products,
+		CursorId: nextCursorId,
+	}
+
+	utils.JSONResponse(w, http.StatusOK, responseData)	
 }
 
 // w.Header().Set("Content-Type", "application/json")

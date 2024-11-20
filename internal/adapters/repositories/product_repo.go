@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"fmt"
+
 	"github.com/lakeside763/product-service/internal/core/models"
 	"github.com/lakeside763/product-service/internal/ports/interfaces"
 	"github.com/lakeside763/product-service/pkg/utils"
@@ -16,36 +18,41 @@ func NewProductRepo(db *gorm.DB) interfaces.Products {
 }
 
 // GetProducts implements interfaces.Products.
-func (repo *ProductRepo) GetProducts(category string, priceLessThan int, lastProductId string, pageSize int) ([]*models.Product, error) {
+func (repo *ProductRepo) GetProducts(category string, priceLessThan int, cursorId string, pageSize int) ([]*models.Product, string, error) {
 	var products []*models.Product
 
-	if pageSize <= 0 {
-		pageSize = 20
-	} else if pageSize > 100 {
-		pageSize  = 100
-	}
-
+	pageSize = utils.PageSize(pageSize)
 	priceLessThan = utils.ConvertPriceToStoredFormat(priceLessThan)
 
 	// Start the query
-	query := repo.DB.Where("category = ?", category).Limit(pageSize).Order("created_at ASC")
+	query := repo.DB.Where("category = ?", category).Limit(pageSize).Order("serial_id ASC")
 
 	// Apply the price filter conditionally
 	if priceLessThan > 0 {
 		query = query.Where("price < ?", priceLessThan)
 	}
 
-	// Apply the ID filter only if lastProductId is not empty
-	if lastProductId != "" {
-		query = query.Where("id > ?", lastProductId)
+	// Apply the ID filter only if nextCursorId is not empty
+	if cursorId != "" {
+		serialId, err := utils.DecodeCursorId(cursorId)
+		if err != nil {
+			return nil, "", fmt.Errorf("invalid cursor: %w", err)
+		}
+		query = query.Where("serial_id > ?", serialId)
 	}
 
 	// Execute the query
 	if err := query.Find(&products).Error; err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return products, nil
+	var nextCursorId string
+	if len(products) > 0 {
+		lastProduct := products[len(products)-1]
+		nextCursorId = utils.EncodeCursorId(lastProduct.SerialId)
+	}
+
+	return products, nextCursorId, nil
 }
 
 func (repo *ProductRepo) GetMaxDiscount(category string, sku string) (float64, error) {
