@@ -39,7 +39,12 @@ APP_PORT=4500
 - Run the app on Docker using docker compose cmd
 ```
 - docker compose up
+
+Additionally
+- docker compose build --no-cache
+- docker compose down --volumes
 ```
+
 
 - Run a coverage test (unit testing the product repo and service)
 ```
