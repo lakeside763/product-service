@@ -33,17 +33,17 @@ func (s *ProductService) GetProductsWithDiscount(
 	}
 
 	// Map products to ProductWithDiscountResponse
-	var response []*models.ProductWithDiscountResponse
+	var data []*models.ProductWithDiscountResponse
 	for _, product := range products {
 		// Apply discount to the product
 		discount, err := s.getDiscountForProduct(product)
 		if err != nil {
 			return nil, "", err
 		}
-		response = append(response, s.mapToProductWithDiscountResponse(product, discount))
+		data = append(data, s.mapToProductWithDiscountResponse(product, discount))
 	}
 
-	return response, nextCursorId, nil
+	return data, nextCursorId, nil
 }
 
 func (s *ProductService) getDiscountForProduct(product *models.Product) (float64, error) {

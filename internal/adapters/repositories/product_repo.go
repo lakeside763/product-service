@@ -32,7 +32,7 @@ func (repo *ProductRepo) GetProducts(category string, priceLessThan int, cursorI
 		query = query.Where("price < ?", priceLessThan)
 	}
 
-	// Apply the ID filter only if nextCursorId is not empty
+	// Apply the ID filter only if cursorId is not empty
 	if cursorId != "" {
 		serialId, err := utils.DecodeCursorId(cursorId)
 		if err != nil {
@@ -46,11 +46,9 @@ func (repo *ProductRepo) GetProducts(category string, priceLessThan int, cursorI
 		return nil, "", err
 	}
 
-	var nextCursorId string
-	if len(products) > 0 {
-		lastProduct := products[len(products)-1]
-		nextCursorId = utils.EncodeCursorId(lastProduct.SerialId)
-	}
+	nextCursorId := utils.GetNextCursor(products, func(item *models.Product) int64 {
+		return item.SerialId
+	})
 
 	return products, nextCursorId, nil
 }

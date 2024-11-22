@@ -38,3 +38,17 @@ func DecodeCursorId(cursorId string) (int64, error) {
 
 	return serialId, nil
 }
+
+func GetNextCursor[T any](items []T, getSerialId func(item T) int64) string {
+	// Check if the slice is empty
+	if len(items) == 0 {
+		return ""
+	}
+
+	// Get the last item and its SerialId
+	lastItem := items[len(items)-1]
+	serialId := getSerialId(lastItem)
+
+	// Encode and return the cursor ID
+	return EncodeCursorId(serialId)
+}
