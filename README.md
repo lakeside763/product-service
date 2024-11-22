@@ -49,60 +49,63 @@ go test -v ./...
 ### API Documentation
 - GetProducts endpoint
 ```
-- http://localhost:4500/products?category=boots&priceLessThan=800&pageSize=10&lastProductId=2c870ffa-a71e-48f9-9e98-20b0f640c5b6
+- http://localhost:4500/products?category=boots&priceLessThan=800&pageSize=10&cursorId=MS00NjYzNTU=
 
 From the query string
 - category is required
 - priceLessThan is optional
 - pageSize is optional
-- lastProductId is optional
+- cursorId is optional
 ```
 - GetProducts sample results
 ```
-[
-    {
-        "id": "2c870ffa-a71e-48f9-9e98-20b0f640c5b6",
-        "sku": "000003",
-        "name": "Ashlington leather ankle boots",
-        "category": "boots",
-        "price": {
-            "original": 710,
-            "final": 461.5,
-            "discount_percentage": "35%",
-            "currency": "EUR"
+{
+    "data": [
+        {
+            "id": "664beb14-a287-4fa5-85c2-7fbd6a5491bf",
+            "sku": "000001",
+            "name": "BV Lean leather ankle boots",
+            "category": "boots",
+            "price": {
+                "original": 890,
+                "final": 489.5,
+                "discount_percentage": "45%",
+                "currency": "EUR"
+            },
+            "created_at": "2024-11-20T01:30:38.039149Z",
+            "updated_at": "2024-11-20T01:30:38.039149Z"
         },
-        "created_at": "2024-11-10T06:16:09.643039Z",
-        "updated_at": "2024-11-10T06:16:09.643039Z"
-    },
-    {
-        "id": "44c3472b-978e-4e50-8acf-676d171a2721",
-        "sku": "000004",
-        "name": "Naima embellished suede sandals",
-        "category": "sandals",
-        "price": {
-            "original": 795,
-            "final": 636,
-            "discount_percentage": "20%",
-            "currency": "EUR"
+        {
+            "id": "f54db8c2-e541-41e8-b1af-6ea29d9beadb",
+            "sku": "000002",
+            "name": "BV Lean leather ankle boots",
+            "category": "boots",
+            "price": {
+                "original": 990,
+                "final": 693,
+                "discount_percentage": "30%",
+                "currency": "EUR"
+            },
+            "created_at": "2024-11-20T01:30:38.039149Z",
+            "updated_at": "2024-11-20T01:30:38.039149Z"
         },
-        "created_at": "2024-11-10T06:16:09.643039Z",
-        "updated_at": "2024-11-10T06:16:09.643039Z"
-    },
-    {
-        "id": "e15e3796-d947-4497-9e13-6a850da634ce",
-        "sku": "000005",
-        "name": "Nathane leather sneakers",
-        "category": "sneakers",
-        "price": {
-            "original": 590,
-            "final": 442.5,
-            "discount_percentage": "25%",
-            "currency": "EUR"
-        },
-        "created_at": "2024-11-10T06:16:09.643039Z",
-        "updated_at": "2024-11-10T06:16:09.643039Z"
-    }
-]
+        {
+            "id": "edb4bdf4-e7a1-40a7-8f19-1f0341f5eb71",
+            "sku": "000003",
+            "name": "Ashlington leather ankle boots",
+            "category": "boots",
+            "price": {
+                "original": 710,
+                "final": 497,
+                "discount_percentage": "30%",
+                "currency": "EUR"
+            },
+            "created_at": "2024-11-20T01:30:38.039149Z",
+            "updated_at": "2024-11-20T01:30:38.039149Z"
+        }
+    ],
+    "cursorId": "My00NTM0NTE="
+}
 ```
 
 ### Folder structure
