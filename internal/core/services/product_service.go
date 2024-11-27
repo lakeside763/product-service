@@ -96,3 +96,18 @@ func (s *ProductService) mapToProductWithDiscountResponse(
 		UpdatedAt: product.UpdatedAt,
 	}
 }
+
+func (s *ProductService) CreateNewProduct(input models.CreateProductInput) (*models.Product, error) {
+	// Check if product exists
+	if err := s.repo.CheckProductExistsByName(input.Name); err != nil {
+		return nil, err
+	}
+
+	// Create new product
+	product, err := s.repo.CreateProduct(input)
+	if err != nil {
+		return nil, err
+	}
+
+	return product, nil
+}

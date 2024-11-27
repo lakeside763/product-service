@@ -10,7 +10,8 @@ import (
 )
 
 func EncodeCursorId(serialId int64) string {
-	rand.Seed(time.Now().UnixNano())
+	// Create a local random generator with a new seed
+	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
 	salt := rand.Int63n(1000000)
 
 	data := fmt.Sprintf("%d-%d", serialId, salt)

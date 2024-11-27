@@ -17,6 +17,16 @@ type MockProducts struct {
 	recorder *MockProductsMockRecorder
 }
 
+// CheckProductExistsByName implements interfaces.Products.
+func (m *MockProducts) CheckProductExistsByName(name string) error {
+	panic("unimplemented")
+}
+
+// CreateProduct implements interfaces.Products.
+func (m *MockProducts) CreateProduct(p models.CreateProductInput) (*models.Product, error) {
+	panic("unimplemented")
+}
+
 // MockProductsMockRecorder is the mock recorder for MockProducts.
 type MockProductsMockRecorder struct {
 	mock *MockProducts

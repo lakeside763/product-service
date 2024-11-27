@@ -17,4 +17,5 @@ func ProductRouter(router *httprouter.Router, productRepo interfaces.Products, c
 
 	// Register routes
 	router.GET("/products", productHandler.GetProducts)
+	router.POST("/products", productHandler.CreateProduct)
 }
